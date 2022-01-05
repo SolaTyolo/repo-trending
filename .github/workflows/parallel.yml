@@ -1,0 +1,69 @@
+name: "Repo Multi Trending Weekly"
+
+on:
+  schedule:
+    - cron: "5 2 1 * *"
+  workflow_dispatch:
+    inputs:
+      name:
+        description: "Person to click"
+        required: true
+        default: "SolaTyolo"
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    name: ${{matrix.lang}} Cralwer
+    strategy:
+      fail-fast: false
+      matrix:
+        lang:
+          - go
+          - rust
+          - typescript
+          - php
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Fetch Trending Repo
+        uses: monoposer/repo-trending-action@v1.2.0
+        with:
+          lang: ${{matrix.lang}}  # will create same name dir, MD filename's format like 'YYYYMMDD'
+
+      - name: Upload New Files
+        uses: actions/upload-artifact@v2
+        with:
+          name: "${{matrix.lang}}"
+          path: "${{matrix.lang}}"
+
+  push:
+    name: "Push Files to GH"
+    runs-on: ubuntu-latest
+    needs: 
+      - crawl
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+
+      - name: Download  Commit Files
+        uses: actions/download-artifact@v2
+        with:
+          path: "."
+
+      - name: Commit Files
+        id: commit-hash
+        run: |
+          git add .
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git commit -m "Update"
+
+      - name: Push Changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{secrets.GITHUB_TOKEN}}
+          branch: ${{github.ref}}

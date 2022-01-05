@@ -1,0 +1,33 @@
+name: "Go Repo Trending Weekly"
+
+on:
+  workflow_dispatch:
+  # schedule:
+  #   - cron: "5 2 1 * *"
+
+jobs:
+  Crawl-Go:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Fetch Trending Repo
+        uses: monoposer/repo-trending-action@v1.2.0
+        with:
+          lang: go
+
+      - name: Commit Files
+        run: |
+          ls -al
+          git add .
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git commit -m "Update"
+
+      - name: Push Changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{secrets.GITHUB_TOKEN}}
+          branch: ${{github.ref}}
