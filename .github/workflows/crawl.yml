@@ -19,7 +19,7 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Fetch Trending Repo
-      uses: monoposer/trending-repo-weekly@v1
+      uses: monoposer/repo-trending-action@v1.0.0
       with:
         lang: go
 
