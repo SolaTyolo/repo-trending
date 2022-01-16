@@ -2,7 +2,7 @@ name: "Repo Multi Trending Weekly"
 
 on:
   schedule:
-    - cron: "5 2 1 * *"
+    - cron: "5 2 * * 1"
   workflow_dispatch:
     inputs:
       name:
